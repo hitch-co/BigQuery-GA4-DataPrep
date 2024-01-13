@@ -23,7 +23,7 @@
 - `timestamp`: Exact time of the product interaction.
 - `product_id`: Unique identifier for each product.
 - `product_category`: Category of the product.
-- `interaction_type`: Type of product interaction (e.g., view, add_to_cart, remove_from_cart).
+- `event_type`: Type of product interaction (e.g., view, add_to_cart, remove_from_cart).
 - `quantity`: Number of products interacted with (useful for add_to_cart and purchase events).
 - `view_duration`: Time spent viewing the product (if applicable).
 - `abandonment_point_stg`: Stage of cart abandonment (if applicable).
