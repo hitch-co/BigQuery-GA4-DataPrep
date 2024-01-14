@@ -64,6 +64,7 @@ class ConfigManager:
 
         # BQ Details/Queries:
         self.bq_project_id = yaml_config.get('bq_details', {}).get('bq_project_id')
+        self.primary_bq_query_dataset_id = yaml_config.get('bq_details', {}).get('bq_dataset_id')
 
         #primary_bq_query
         self.primary_bq_query_querypath = yaml_config.get('primary_bq_query', {}).get('query_path')

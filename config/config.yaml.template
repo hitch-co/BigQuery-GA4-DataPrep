@@ -1,0 +1,14 @@
+env_dir_path: 'path/to/env'
+env_file_name: 'config.env'
+
+bq_details:
+  bq_project_id: 'key-utility-407314'
+  bq_dataset_id: 'eh_ga4_stg'
+
+primary_bq_query:
+  query_path: 'path/to/your/sql/file.sql'
+  bq_table_id: 'my_test_table1'
+
+other_bq_query:
+  query_path: 'path/to/your/sql/file.sql'
+  bq_table_id: 'my_test_table2'

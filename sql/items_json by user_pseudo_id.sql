@@ -1,11 +1,13 @@
+CREATE OR REPLACE TABLE {dataset_id}.{table_id} as (
 --Process:
 -- 1: Grab the record in struct form and unnest into a json string
 -- 2: Capture each nested value as a column 
 WITH users_purchases as (
   SELECT 
-    user_pseudo_id,
-    ga_session_id,
-    event_timestamp,
+    CAST(user_pseudo_id AS STRING) as user_pseudo_id,
+    CAST(ga_session_id AS STRING) as ga_session_id,
+    TIMESTAMP_MICROS(event_timestamp) as event_timestamp,
+    CAST(event_timestamp as STRING) as event_timestamp_string,
     items_json,
     items,
   FROM (
@@ -65,3 +67,4 @@ SELECT
   JSON_EXTRACT_SCALAR(items_json, '$[0].item_name') as item_name,
   JSON_EXTRACT_SCALAR(items_json, '$[0].item_brand') as item_brand
 FROM users_purchases
+)
