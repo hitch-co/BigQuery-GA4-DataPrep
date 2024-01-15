@@ -25,7 +25,7 @@ class BigQueryIO:
         self.logger.debug("")
 
     def _generate_bq_query_from_file(self, replacements: dict, sql_file_path: str, query_vs_create='query') -> str:
-        self.logger.info('---------------------------------')
+        self.logger.info('\n---------------------------------')
         self.logger.debug(f"replacements: {replacements}")
         self.logger.debug(f"sql_file_path: {sql_file_path}")
 
@@ -60,17 +60,16 @@ class BigQueryIO:
 
         try:
             # Start the query job
-            self.logger.info("Starting BigQuery job...")
             query_job = self.bq_client.query(query)
 
             # Wait for the job to complete (this will block until the job is done)
-            self.logger.info(f"Executing query... result to come:")
-            self.logger.info(query_job.result())
+            self.logger.debug(f"Starting BigQuery job... Executing query...")
+            self.logger.debug(query_job.result())
 
             # Get the results if available
             dataframe = query_job.to_dataframe()
             if dataframe is None:
-                self.logger.info("Query likely set to 'create', thus returned no results")
+                self.logger.info("If query was set to 'create', no results are returned")
             else: 
                 return dataframe
 
@@ -110,7 +109,7 @@ class BigQueryIO:
 
         # Send the query to BigQuery
         results = self._send_queryjob_to_bq(query)
-        
+
         self.logger.debug(f"results: {results}")
         return results
     
