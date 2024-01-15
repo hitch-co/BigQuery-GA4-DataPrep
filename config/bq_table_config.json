@@ -1,0 +1,23 @@
+{
+    "_session_traffic_sources_and_details": {
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_session_traffic_sources_and_details.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },
+    "my_test_table1": {
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/items_json by user_pseudo_id.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },
+    "my_tesqut_table2": {
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/test.sql",
+        "schema": [
+            {"name": "field1", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "field2", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    }
+}
