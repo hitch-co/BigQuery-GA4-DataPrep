@@ -1,6 +1,7 @@
 import os
 import yaml
 import dotenv
+import json
 
 from classes.my_logging import create_logger
 
@@ -34,6 +35,18 @@ class ConfigManager:
         yaml_full_path = os.path.join(yaml_filepath, yaml_filename)
         self.load_yaml_config(yaml_full_path)
         self.set_env_variables()
+        self.load_json_schemas()
+
+    def load_json_schemas(self):
+        filepath = os.path.join(self.bq_table_config_dirpath, self.bq_table_config_filename)
+        try:
+            with open(filepath, 'r') as file:
+                self.bq_table_config = json.load(file)
+        except Exception as e:
+            self.logger.error(f"Error loading JSON config file: {e}")  
+
+    def get_json_item(self, json, json_key):
+        return json.get(json_key)     
 
     def load_yaml_config(self, yaml_full_path):
         try:
@@ -62,27 +75,25 @@ class ConfigManager:
         self.env_dir_path = yaml_config.get('env_dir_path')
         self.env_file_name = yaml_config.get('env_file_name')
 
+        # BQ table config paths (schemas and querypaths)
+        self.bq_table_config_dirpath = yaml_config.get('bq_table_config_dirpath')
+        self.bq_table_config_filename = yaml_config.get('bq_table_config_filename')
+
         # BQ Details/Queries:
         self.bq_project_id = yaml_config.get('bq_details', {}).get('bq_project_id')
         self.primary_bq_query_dataset_id = yaml_config.get('bq_details', {}).get('bq_dataset_id')
 
-        #primary_bq_query
-        self.primary_bq_query_querypath = yaml_config.get('primary_bq_query', {}).get('query_path')
-        self.primary_bq_query_table_id = yaml_config.get('primary_bq_query', {}).get('bq_table_id')
-
-        #other_bq_query
-        self.other_bq_query_querypath = yaml_config.get('other_bq_query', {}).get('query_path')
-        self.other_bq_query_table_id = yaml_config.get('other_bq_query', {}).get('bq_table_id')
- 
 def main():
     config_manager = ConfigManager(
         yaml_filepath='C:/Users/Admin/OneDrive/Desktop/_work/__repos (unpublished)/_____CONFIG/google-analytics-insight-generation/config',
         yaml_filename='config.yaml'
         )
-    print(config_manager.primary_bq_query_querypath)
-    print(config_manager.primary_bq_query_table_id)
-    print(config_manager.other_bq_query_querypath)
-    print(config_manager.other_bq_query_table_id)
     
+    # Test cases
+    item = config_manager.bq_table_config['my_test_table1']
+    print(config_manager.bq_table_config)
+    print(item['query_path'])
+    print(config_manager.bq_project_id)
+
 if __name__ == "__main__":
     main()
