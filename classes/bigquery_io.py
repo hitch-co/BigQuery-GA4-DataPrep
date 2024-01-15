@@ -24,29 +24,37 @@ class BigQueryIO:
             self.logger.debug(f"{key}: {value}")
         self.logger.debug("")
 
-    def _generate_bq_query_from_file(self, replacements: dict, sql_file_path: str) -> str:
+    def _generate_bq_query_from_file(self, replacements: dict, sql_file_path: str, query_vs_create='query') -> str:
         self.logger.info('---------------------------------')
         self.logger.debug(f"replacements: {replacements}")
         self.logger.debug(f"sql_file_path: {sql_file_path}")
-        self.logger.info(f"")
-
-        assert 'dataset_id' in replacements.keys(), "replacements must contain a key for 'dataset_id'"
-        assert 'table_id' in replacements.keys(), "replacements must contain a key for 'table_id'"
 
         # Read the SQL command from the .sql file
         sql_file_path = os.path.join(sql_file_path)
         with open(sql_file_path, 'r') as file:
             sql_template = file.read()
-        
-        # Format the SQL with the table_id
+
+        # Format the SQL with the replacements dictionary
         query = sql_template.format(**replacements)
 
+        # Add the optional create/replace logic
+        if query_vs_create == 'create':
+            assert 'dataset_id' in replacements.keys(), "replacements must contain a key for 'dataset_id'"
+            assert 'table_id' in replacements.keys(), "replacements must contain a key for 'table_id'"
+
+            query_final = f"CREATE OR REPLACE TABLE {replacements['dataset_id']}.{replacements['table_id']} AS ({query})"    
+            message = f"The BigQuery table creation query for [{replacements['table_id']}] was generated from a local file:"
+
+        elif query_vs_create == 'query':
+            query_final = query
+            message = f"The BigQuery Query was completed for .sql file: {sql_file_path}"
+
         # Log the generation of the query
-        self.logger.info(f"The BigQuery table creation query for [{replacements['table_id']}]was generated from file:")
-        self.logger.debug(query)
+        self.logger.info(message)
+        self.logger.debug(query_final)
 
         # Return the formatted query string
-        return query
+        return query_final
 
     def _send_queryjob_to_bq(self, query):
 
@@ -58,6 +66,13 @@ class BigQueryIO:
             # Wait for the job to complete (this will block until the job is done)
             self.logger.info(f"Executing query... result to come:")
             self.logger.info(query_job.result())
+
+            # Get the results if available
+            dataframe = query_job.to_dataframe()
+            if dataframe is None:
+                self.logger.info("Query likely set to 'create', thus returned no results")
+            else: 
+                return dataframe
 
         except GoogleAPIError as e:
             # Log any API errors
@@ -76,7 +91,8 @@ class BigQueryIO:
             self,
             sql_file_path: str,
             dataset_id: str,
-            table_id: str
+            table_id: str,
+            query_vs_create='query'
             ):
         
         # Generate the query
@@ -88,12 +104,16 @@ class BigQueryIO:
         # Generate the query from sql_file_path
         query = self._generate_bq_query_from_file(
             replacements=replacements,
-            sql_file_path=sql_file_path
+            sql_file_path=sql_file_path,
+            query_vs_create=query_vs_create
         )
 
         # Send the query to BigQuery
-        self._send_queryjob_to_bq(query)
-
+        results = self._send_queryjob_to_bq(query)
+        
+        self.logger.debug(f"results: {results}")
+        return results
+    
 def main():
     bq = BigQueryIO()
     # # 2. Generate a query from a file
