@@ -36,12 +36,21 @@ class ConfigManager:
         self.load_yaml_config(yaml_full_path)
         self.set_env_variables()
         self.load_json_schemas()
+        self.load_json_runtime_table_ids()
 
     def load_json_schemas(self):
         filepath = os.path.join(self.bq_table_config_dirpath, self.bq_table_config_filename)
         try:
             with open(filepath, 'r') as file:
                 self.bq_table_config = json.load(file)
+        except Exception as e:
+            self.logger.error(f"Error loading JSON config file: {e}")  
+
+    def load_json_runtime_table_ids(self):
+        filepath = os.path.join(self.runtime_table_ids_filepath)
+        try:
+            with open(filepath, 'r') as file:
+                self.runtime_table_ids_json = json.load(file)
         except Exception as e:
             self.logger.error(f"Error loading JSON config file: {e}")  
 
@@ -82,6 +91,9 @@ class ConfigManager:
         # BQ Details/Queries:
         self.bq_project_id = yaml_config.get('bq_details', {}).get('bq_project_id')
         self.primary_bq_query_dataset_id = yaml_config.get('bq_details', {}).get('bq_dataset_id')
+
+        # RUNTIME TABLE IDS:
+        self.runtime_table_ids_filepath = yaml_config.get('runtime_table_ids_filepath')
 
 def main():
     config_manager = ConfigManager(
