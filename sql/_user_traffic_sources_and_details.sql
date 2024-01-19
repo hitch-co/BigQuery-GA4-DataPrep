@@ -26,7 +26,7 @@ WITH
     GROUP BY pv.user_pseudo_id
   ),
 
-  session_details AS (
+  user_details AS (
     SELECT
       user_pseudo_id,
       MIN(event_timestamp) as min_user_event_timestamp,
@@ -72,7 +72,7 @@ WITH
       pv.pageviews
 
     FROM t1 as t1
-      LEFT JOIN session_details as ssd
+      LEFT JOIN user_details as ssd
         ON t1.user_pseudo_id = ssd.user_pseudo_id
       LEFT JOIN pageviews as pv
         ON t1.user_pseudo_id = pv.user_pseudo_id
