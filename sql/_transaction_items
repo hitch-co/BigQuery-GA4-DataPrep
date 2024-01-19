@@ -1,0 +1,29 @@
+WITH results as  (
+  SELECT
+    event_timestamp,
+    event_name,
+    user_pseudo_id,
+    ecommerce.transaction_id as transaction_id,
+    ecommerce.total_item_quantity as total_item_quantity,
+    item.item_id
+  FROM
+    `key-utility-407314.eh_ga4_obfuscated_sample_ecommerce.eh_ga4_obfuscated_filtered`,
+    UNNEST(items) AS item
+  WHERE
+    event_name = 'purchase'
+  ORDER BY
+    user_pseudo_id,
+    transaction_id
+)
+
+SELECT 
+  transaction_id,
+  item_id,
+  event_timestamp,
+  SUM(total_item_quantity) as total_item_quantity
+  SUM(revenue)
+FROM results
+GROUP BY
+  transaction_id,
+  item_id,
+  event_timestamp
