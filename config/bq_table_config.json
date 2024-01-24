@@ -1,25 +1,58 @@
 {
-    "__stg_user_purchase_sources_and_details": {
-        "execution_order_id": 3,
-        "query_path": "C:/_repos/google-analytics-insight-generation/sql/__stg_user_purchase_sources_and_details.sql",
-        "schema": [
-            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
-            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
-        ]
-    },
-
-    "_user_traffic_sources_and_details": {
+    "_transaction_items": {
         "execution_order_id": 1,
-        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_user_traffic_sources_and_details.sql",
+        "dataset_id": "key-utility-407314.eh_ga4_stg",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_transaction_items.sql",
         "schema": [
             {"name": "name", "type": "STRING", "mode": "REQUIRED"},
             {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
         ]
     },    
 
-    "_session_traffic_sources_and_details": {
+    "_items": {
         "execution_order_id": 1,
-        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_session_traffic_sources_and_details.sql",
+        "dataset_id": "key-utility-407314.eh_ga4_stg",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_items.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },    
+
+    "_transactions": {
+        "execution_order_id": 1,
+        "dataset_id": "key-utility-407314.eh_ga4_stg",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_transactions.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },    
+
+    "_users": {
+        "execution_order_id": 1,
+        "dataset_id": "key-utility-407314.eh_ga4_stg",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_users.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },    
+
+    "_sessions": {
+        "execution_order_id": 1,
+        "dataset_id": "key-utility-407314.eh_ga4_stg",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/_sessions.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },    
+
+    "__prod_users_details": {
+        "execution_order_id": 2,
+        "dataset_id": "key-utility-407314.eh_ga4_prod",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/__prod_users_details.sql",
         "schema": [
             {"name": "name", "type": "STRING", "mode": "REQUIRED"},
             {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}

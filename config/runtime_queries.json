@@ -1,7 +1,10 @@
 {
     "table_ids": [
-        "_user_traffic_sources_and_details",
-        "_session_traffic_sources_and_details",
-        "__stg_user_purchase_sources_and_details"
+        "_sessions",
+        "_users",
+        "_items",
+        "_transaction_items",
+        "_transactions",
+        "__prod_users_details"
     ]
 }
