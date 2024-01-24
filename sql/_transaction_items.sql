@@ -30,4 +30,3 @@ GROUP BY
   item_id,
   event_timestamp
 ORDER BY transaction_id, item_id
-
