@@ -1,5 +1,6 @@
 #bigquery_io.py
 import os
+import json
 
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound, GoogleCloudError
@@ -24,8 +25,12 @@ class BigQueryIO:
             self.logger.debug(f"{key}: {value}")
         self.logger.debug("")
 
-    def _generate_bq_query_from_file(self, replacements: dict, sql_file_path: str, query_vs_create='query') -> str:
-        self.logger.info('\n---------------------------------')
+    def _generate_bq_query_from_file(self,
+        replacements: dict, 
+        sql_file_path: str, 
+        query_vs_create='query'
+        ) -> str:
+        
         self.logger.debug(f"replacements: {replacements}")
         self.logger.debug(f"sql_file_path: {sql_file_path}")
 
@@ -54,10 +59,10 @@ class BigQueryIO:
         self.logger.debug(query_final)
 
         # Return the formatted query string
+        self.logger.info("\n")
         return query_final
 
     def _send_queryjob_to_bq(self, query):
-
         try:
             # Start the query job
             query_job = self.bq_client.query(query)
@@ -86,7 +91,7 @@ class BigQueryIO:
             job_stats = query_job.query_plan
             self.logger.debug(f"Query plan: {job_stats}")
 
-    def generate_query_and_send_to_bq(
+    def execute_query_from_filepath(
             self,
             sql_file_path: str,
             dataset_id: str,
@@ -112,15 +117,61 @@ class BigQueryIO:
 
         self.logger.debug(f"results: {results}")
         return results
-    
+
+    def execute_queries_from_json(
+        self, 
+        json_array,
+        query_vs_create='query'
+        ):
+        required_keys = {'execution_order_id', 'dataset_id', 'query_path', 'schema'}
+        
+        print(f"json_array: {json_array}")
+
+        for key, item in json_array.items():
+            print(f"item: {item}")
+            if not required_keys.issubset(item):
+                missing_keys = required_keys - item.keys()
+                raise ValueError(f"Missing required keys: {missing_keys}")
+
+        sorted_queries = sorted(json_array.items(), key=lambda x: x[1]['execution_order_id'])
+
+        for query_name, query_info in sorted_queries:
+            sql_file_path = query_info['query_path']
+            dataset_id = query_info['dataset_id']
+            table_id = query_name      
+
+            print(f"query_name: {query_name}")
+            print(f"query_info: {query_info}")
+            print(f"sql_file_path: {sql_file_path}")
+            print(f"dataset_id: {dataset_id}")
+            print(f"table_id: {table_id}")
+
+            # Execute the query
+            self.execute_query_from_filepath(
+                sql_file_path=sql_file_path,
+                dataset_id=dataset_id,
+                table_id=table_id,
+                query_vs_create=query_vs_create
+            )
+  
 def main():
-    bq = BigQueryIO()
-    # # 2. Generate a query from a file
+    bq_client = bigquery.Client(project='key-utility-407314')
+    bq = BigQueryIO(bq_client)
+    # # 2. Generate a query from a filepath
     # bq._generate_bq_query_from_file(
     #     table_id='', 
     #     sql_file_path=''
     #     )
-    print(bq)
+
+    #3. Execute queries from a json array
+    with open(r'C:\_repos\google-analytics-insight-generation\config\bq_table_config.json', 'r') as file:
+        json_array = json.load(file)
+    
+    bq.execute_queries_from_json(
+        json_array,
+        query_vs_create='query'
+        )
+    return(bq)
 
 if __name__ == '__main__':
     main()
