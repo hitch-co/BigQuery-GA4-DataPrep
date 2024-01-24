@@ -10,4 +10,4 @@ SELECT DISTINCT
 FROM `key-utility-407314.eh_ga4_obfuscated_sample_ecommerce.eh_ga4_obfuscated_filtered`,
  UNNEST(items)
 WHERE event_name = 'purchase'
---AND item_id = '9184749'
+/*AND item_id = '9184749'*/
