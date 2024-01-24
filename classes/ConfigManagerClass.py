@@ -57,9 +57,6 @@ class ConfigManager:
         except Exception as e:
             self.logger.error(f"Error loading JSON config file: {e}")  
 
-    def get_json_item(self, json, json_key):
-        return json.get(json_key)     
-
     def load_yaml_config(self, yaml_full_path):
         try:
             with open(yaml_full_path, 'r') as file:
