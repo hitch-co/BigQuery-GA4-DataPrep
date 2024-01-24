@@ -35,14 +35,15 @@ class ConfigManager:
         yaml_full_path = os.path.join(yaml_filepath, yaml_filename)
         self.load_yaml_config(yaml_full_path)
         self.set_env_variables()
-        self.load_json_schemas()
-        self.load_json_runtime_table_ids()
+        self.bq_table_config = self.load_json_schemas()
+        self.runtime_table_ids_json = self.load_json_runtime_table_ids()
 
     def load_json_schemas(self):
         filepath = os.path.join(self.bq_table_config_dirpath, self.bq_table_config_filename)
         try:
             with open(filepath, 'r') as file:
-                self.bq_table_config = json.load(file)
+                bq_table_config = json.load(file)
+            return bq_table_config
         except Exception as e:
             self.logger.error(f"Error loading JSON config file: {e}")  
 
@@ -50,7 +51,9 @@ class ConfigManager:
         filepath = os.path.join(self.runtime_table_ids_filepath)
         try:
             with open(filepath, 'r') as file:
-                self.runtime_table_ids_json = json.load(file)
+                runtime_table_ids_json = json.load(file)
+            self.logger.debug(f"Loaded runtime_table_ids_json: {runtime_table_ids_json}")
+            return runtime_table_ids_json
         except Exception as e:
             self.logger.error(f"Error loading JSON config file: {e}")  
 
@@ -96,16 +99,18 @@ class ConfigManager:
         self.runtime_table_ids_filepath = yaml_config.get('runtime_table_ids_filepath')
 
 def main():
-    config_manager = ConfigManager(
+    config = ConfigManager(
         yaml_filepath='C:/Users/Admin/OneDrive/Desktop/_work/__repos (unpublished)/_____CONFIG/google-analytics-insight-generation/config',
         yaml_filename='config.yaml'
         )
     
     # Test cases
-    item = config_manager.bq_table_config['my_test_table1']
-    print(config_manager.bq_table_config)
+    item = config.bq_table_config['_transaction_items']
+    print(f"config.bq_project_id: {config.bq_project_id}\n")
+    print(f"config.bq_table_config: {config.bq_table_config}\n")
+    print(f"config.runtime_table_ids_json: {config.runtime_table_ids_json}\n")
     print(item['query_path'])
-    print(config_manager.bq_project_id)
+
 
 if __name__ == "__main__":
     main()
