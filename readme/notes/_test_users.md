@@ -23,19 +23,19 @@ End Date: 2020-01-31
 # Data is filtered to user list below
 | user_pseudo_id        | session_ids | transaction_ids | pageview records
 |-----------------------|-------------|-----------------|-----------------
+| 2221352.0772999791    | 5 | 2 | 38
 | 29339544.5051604260   | 7 | 4 | 51
 | 5184896.7773934801    | 5 | 4 | 39
-| 73497675.9720954301   | 5 | 3 | 81
-| 2221352.0772999791    | 5 | 2 | 38
 | 6724688.1020387197    | 5 | 2 | 35
 | 67504810.2599834553   | 5 | 2 | 78
+| 73497675.9720954301   | 5 | 3 | 81
 | 77052125.0799530822   | 7 | 2 | 166
 |-------------------------------------------------------------------------
 |       --TOTAL--       | 39| 19| 488
 
 # Summary statistics by user
 - Number of records in our query: 1639
-- Number of sessions: 
-- Number of pageviews by user: 
-- Purchase Revenue: 
-- Number of transaction_ids:  
+- Number of sessions: 39
+- Number of pageviews by user: 488 
+- Purchase Revenue: 755.0 (validated using `__prod_users_details` query)
+- Number of transaction_ids: 19
