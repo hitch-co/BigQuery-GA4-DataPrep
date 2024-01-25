@@ -125,7 +125,7 @@ def ___log_as_json(logger, obj, indent=2):
     """
     try:
         # Serialize the object to a JSON string with custom serialization for long strings
-        json_string = json.dumps(obj, indent=indent, default=_truncate_long_strings)
+        json_string = json.dumps(obj, indent=indent, default=___truncate_obj_strings)
 
         logger.debug(json_string)
 
