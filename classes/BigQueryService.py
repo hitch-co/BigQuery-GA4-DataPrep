@@ -8,7 +8,7 @@ from google.api_core.exceptions import GoogleAPIError
 
 from classes.LoggingManager import create_logger
 
-class BigQueryIO:
+class BigQueryService:
     def __init__(self, bq_client) -> None:
         self.logger = create_logger(
             dirname='log', 
@@ -151,7 +151,7 @@ class BigQueryIO:
   
 def main():
     bq_client = bigquery.Client(project='key-utility-407314')
-    bq = BigQueryIO(bq_client)
+    bq = BigQueryService(bq_client)
 
     # # 2. Generate a query from a filepath
     # bq._generate_bq_query_from_file(

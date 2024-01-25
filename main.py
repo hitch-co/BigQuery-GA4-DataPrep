@@ -1,6 +1,6 @@
 # Importing necessary modules
 from google.cloud import bigquery
-from classes.BigQueryIO import BigQueryService
+from classes.BigQueryService import BigQueryService
 from classes.ConfigManager import ConfigManager
 
 # Loading configuration from a YAML file
