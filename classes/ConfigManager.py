@@ -3,7 +3,7 @@ import yaml
 import dotenv
 import json
 
-from classes.my_logging import create_logger
+from classes.LoggingManager import create_logger
 
 runtime_logger_level = 'DEBUG'
 
@@ -56,9 +56,6 @@ class ConfigManager:
             return runtime_table_ids_json
         except Exception as e:
             self.logger.error(f"Error loading JSON config file: {e}")  
-
-    def get_json_item(self, json, json_key):
-        return json.get(json_key)     
 
     def load_yaml_config(self, yaml_full_path):
         try:

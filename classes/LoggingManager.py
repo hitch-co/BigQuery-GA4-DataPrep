@@ -1,6 +1,7 @@
 import logging
 import inspect
 import json
+import functools
 
 def create_logger(
         dirname='log', 
@@ -16,10 +17,11 @@ def create_logger(
         'INFO': logging.INFO,
         'WARNING': logging.WARNING,
         'ERROR': logging.ERROR,
-        'EXCEPTION': logging.ERROR,  # Exception is not a level in Python logging; it's usually logged as an ERROR
+        'EXCEPTION': logging.ERROR,
     }
+    debug_level = debug_level.upper()
 
-    if debug_level.upper() not in level_mapping:
+    if debug_level not in level_mapping:
         raise ValueError(f"Invalid debug_level: {debug_level}. Must be one of: {', '.join(level_mapping.keys())}")
 
     logger = logging.getLogger(logger_name if logger_name else __name__)
@@ -29,22 +31,32 @@ def create_logger(
         handler.close()
         logger.removeHandler(handler)
 
-    logger.setLevel(level_mapping[debug_level.upper()])
+    logger.setLevel(level_mapping[debug_level])
 
+    # Create the formatter/
     formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - Name: %(funcName)s - Line: %(lineno)d - %(message)s')
 
     file_handler = logging.FileHandler(f'{dirname}/{logger_name}.log', mode=mode, encoding=encoding)
-    file_handler.setLevel(level_mapping[debug_level.upper()])
+    file_handler.setLevel(level_mapping[debug_level])
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
     if stream_logs == True:
         stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(level_mapping[debug_level.upper()])
+        stream_handler.setLevel(level_mapping[debug_level])
         stream_handler.setFormatter(formatter)
         logger.addHandler(stream_handler)
     
     return logger
+
+def log_class_args(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        logger = logging.getLogger(func.__name__)
+        logger.debug("Positional arguments: %s", args)
+        logger.debug("Keyword arguments: %s", kwargs)
+        return func(self, *args, **kwargs)
+    return wrapper
 
 def ___log_runtime_params(logger, context_object, args_list=None):
     if args_list is None:
