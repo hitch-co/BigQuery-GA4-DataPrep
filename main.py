@@ -9,14 +9,14 @@ config = ConfigManager(
     yaml_filename='config.yaml'
 )
 
-# Initializing BigQuery client with a specific project ID from the configuration
+# Initializing BigQuery client and create an instance of BigQueryService for interacting with BigQuery
 bq_client = bigquery.Client(project=config.bq_project_id)
-# Creating an instance of BigQueryService for interacting with BigQuery
 bq_io = BigQueryService(bq_client)
 
-# Option to either query data or create/replace a table in BigQuery. Define the 
-#  table_id to work with in BigQuery - can be a specific ID, '', 'all', or None 
+# Query data or create/replace a table in BigQuery. 
 query_vs_create = 'create'  # Options: 'create' or 'query'
+
+# Define the table_id to work with in BQ (specific ID, '', 'all', or None)
 runtime_table_id = '_transaction_items'  # Example: '_transaction_items'
 
 # Printing runtime table IDs and their types for debugging and verification purposes
