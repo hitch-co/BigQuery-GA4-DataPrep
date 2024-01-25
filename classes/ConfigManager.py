@@ -3,7 +3,7 @@ import yaml
 import dotenv
 import json
 
-from classes.my_logging import create_logger
+from classes.LoggingManager import create_logger
 
 runtime_logger_level = 'DEBUG'
 

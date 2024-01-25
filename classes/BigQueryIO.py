@@ -6,7 +6,7 @@ from google.cloud import bigquery
 from google.cloud.exceptions import NotFound, GoogleCloudError
 from google.api_core.exceptions import GoogleAPIError
 
-from classes.my_logging import create_logger
+from classes.LoggingManager import create_logger
 
 class BigQueryIO:
     def __init__(self, bq_client) -> None:
@@ -19,11 +19,6 @@ class BigQueryIO:
             )
 
         self.bq_client = bq_client
-
-    def _log_parameters(self, **params):
-        for key, value in params.items():
-            self.logger.debug(f"{key}: {value}")
-        self.logger.debug("")
 
     def _generate_bq_query_from_file(self,
         replacements: dict, 
@@ -157,10 +152,12 @@ class BigQueryIO:
 def main():
     bq_client = bigquery.Client(project='key-utility-407314')
     bq = BigQueryIO(bq_client)
+
     # # 2. Generate a query from a filepath
     # bq._generate_bq_query_from_file(
+    #     replacements={'dataset_id': 'test_dataset', 'table_id': 'test_table'},
     #     table_id='', 
-    #     sql_file_path=''
+    #     query_vs_create=''
     #     )
 
     #3. Execute queries from a json array
@@ -171,7 +168,6 @@ def main():
         json_array,
         query_vs_create='query'
         )
-    return(bq)
 
 if __name__ == '__main__':
     main()
