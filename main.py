@@ -7,7 +7,7 @@ from classes.LoggingManager import LoggerClass
 
 # Setup logger
 logger_name_str = 'main'
-runtime_logger_level = 'INFO'
+runtime_logger_level = 'DEBUG'
 logger_service = LoggerClass(
     dirname='log', 
     logger_name=logger_name_str,
@@ -29,64 +29,35 @@ bq_io = BigQueryService(bq_client)
 
 ##################################################
 # Query data or create/replace a table in BigQuery. 
-query_vs_create = 'query'  # Options: 'create' or 'query'
+query_vs_create = 'create'  # Options: 'create' or 'query'
 
 # Define the table_id to work with in BQ (specific ID, '', 'all', or None)
-runtime_table_id = '_transaction_items'  # '_transaction_items'
+runtime_table_id = 'all'  # '_transaction_items'
 
 #################################################
-# Processing custom table ID if provided
+# Processing custom runtime_table_id if provided
 if runtime_table_id != 'all' and runtime_table_id != '' and runtime_table_id is not None:
     try:
-        # Validate if runtime_table_id is present in the configuration
-        if runtime_table_id not in config.runtime_table_ids_json['table_ids']:
-            logger.error(f"Error: runtime_table_id: '{runtime_table_id}' not found in runtime_table_ids_json")
-            raise ValueError(f"Error: runtime_table_id: '{runtime_table_id}' not found in runtime_table_ids_json")
-        else:
-            # Set table_ids to only the specified runtime_table_id
-            table_ids = [runtime_table_id]
-            logger.info(f"table_id input: '{table_ids}'")
-    except KeyError:
-        # Handle KeyError if the table_id is not found in configuration
-        logger.error(f"Error: Table ID '{runtime_table_id}' not found in configuration.")
-
-    except ValueError as e:
-        # Handle ValueError and display the custom error message
-        logger.error(e)
-
-# Handling the case when 'all' tables are specified
-else:
-    # Set table_ids to all table IDs from the configuration
-    table_ids = config.runtime_table_ids_json['table_ids']
-    logger.info(f"table_ids: {table_ids}")
-
-# Run either create or query for each table_id
-logger.debug(f"this is the config.bq_table_config: {config.bq_table_config}")
-for table_id in table_ids:
-    try:
-        # Fetching BigQuery table configuration from the config
-        bq_table_config_table_details = config.bq_table_config[table_id]
-        logger.debug(f"this is the bq_table_config_table_details: {bq_table_config_table_details}")
-        
-        # Generating the query using the SQL file specified in bq_table_config
-        query = bq_io.execute_query_from_filepath(
-            dataset_id=bq_table_config_table_details['dataset_id'],
-            table_id=table_id,
-            sql_file_path=bq_table_config_table_details['query_path'],
+        json_ajson_array = {runtime_table_id: config.bq_table_config[runtime_table_id]}
+        bq_io.execute_queries_from_json(
+            json_array=json_ajson_array,
             query_vs_create=query_vs_create
         )
 
-        # Printing appropriate messages based on the action performed (create or query)
-        if query_vs_create == 'create':
-            logger.info(f"Finished creating table_id: '{table_id}'. No preview available.")
-        else:
-            logger.info(f"Preview of query:")
-            logger.info(query.head(5))
-        logger.info("\n")
+    except ValueError as e:
+        logger.error(e)
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
+
+# runtime_table_id = 'all' tables are specified
+else:
+    try:
+        bq_io.execute_queries_from_json(
+            json_array=config.bq_table_config,
+            query_vs_create=query_vs_create
+        )
 
     except KeyError as e:
-        # Handling KeyError for an invalid table_id in the configuration
-        logger.error(f"KeyError encountered for table_id '{table_id}': {e}. This may be due to an invalid table_id in your config.")
+        logger.error(f"KeyError encountered: {e}. This may be due to an invalid bq_table_config.")
     except Exception as e:
-        # Handling any other unexpected errors
-        logger.error(f"An unexpected error occurred for table_id '{table_id}': {e}")
+        logger.error(f"An unexpected error occurred in execute_queries_from_json(): {e}")
