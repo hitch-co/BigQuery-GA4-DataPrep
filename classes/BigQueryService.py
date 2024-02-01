@@ -14,7 +14,7 @@ logger_name_str = 'log_bigquery_io'
 class BigQueryService:
     def __init__(self, bq_client) -> None:
         # Loading configuration from a YAML file
-        config = ConfigManager(
+        ConfigManager(
             yaml_filepath='C:/Users/Admin/OneDrive/Desktop/_work/__repos (unpublished)/_____CONFIG/google-analytics-insight-generation/config',
             yaml_filename='config.yaml'
         )
@@ -122,6 +122,7 @@ class BigQueryService:
         self.logger.debug(f"results: {results}")
         return results
 
+    @LoggerClass.log_class_args(logger_name_str)
     def execute_queries_from_json(
         self, 
         json_array,
@@ -145,7 +146,6 @@ class BigQueryService:
             table_id = query_name      
 
             self.logger.info(f"query_name: {query_name}")
-            self.logger.info(f"query_info: {query_info}")
             self.logger.info(f"sql_file_path: {sql_file_path}")
             self.logger.info(f"dataset_id: {dataset_id}")
             self.logger.info(f"table_id: {table_id}")
@@ -159,7 +159,7 @@ class BigQueryService:
             )
   
 def main():
-    bq_client = bigquery.Client(project='key-utility-407314')
+    bq_client = bigquery.Client()
     bq = BigQueryService(bq_client)
 
     # # 2. Generate a query from a filepath
