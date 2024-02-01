@@ -10,6 +10,7 @@ from classes.LoggingManager import LoggerClass
 from classes.ConfigManager import ConfigManager
 
 logger_name_str = 'log_bigquery_io'
+runtime_logger_level = 'INFO'
 
 class BigQueryService:
     def __init__(self, bq_client) -> None:
@@ -21,7 +22,7 @@ class BigQueryService:
         logger_service = LoggerClass(
             dirname='log', 
             logger_name=logger_name_str,
-            debug_level='INFO',
+            debug_level=runtime_logger_level,
             mode='w',
             stream_logs=True
             )
@@ -102,36 +103,53 @@ class BigQueryService:
             table_id: str,
             query_vs_create='query'
             ):
-        
+        # Input validation
+        if not sql_file_path.endswith('.sql'):
+            self.logger.error("The sql_file_path does not point to a .sql file.")
+            return None
+
+        if not dataset_id or not table_id:
+            self.logger.error("Dataset ID and Table ID cannot be empty.")
+            return None
+
         # Generate the query
         replacements = {
             'dataset_id': dataset_id,
             'table_id': table_id
         }
 
-        # Generate the query from sql_file_path
-        query = self._generate_bq_query_from_file(
-            replacements=replacements,
-            sql_file_path=sql_file_path,
-            query_vs_create=query_vs_create
-        )
+        try:
+            # Generate the query from sql_file_path
+            query = self._generate_bq_query_from_file(
+                replacements=replacements,
+                sql_file_path=sql_file_path,
+                query_vs_create=query_vs_create
+            )
 
-        # Send the query to BigQuery
-        results = self._send_queryjob_to_bq(query)
+            # Send the query to BigQuery
+            results = self._send_queryjob_to_bq(query)
+            
+            if results is not None:
+                self.logger.debug(f"Query results: {results}")
+            else:
+                self.logger.info("No results returned from the query.")
 
-        self.logger.debug(f"results: {results}")
-        return results
+            return results
+
+        except FileNotFoundError:
+            self.logger.error(f"The SQL file at {sql_file_path} was not found.")
+            return None
+        except Exception as e:
+            self.logger.error(f"An error occurred while executing the query: {e}")
+            return None
 
     @LoggerClass.log_class_args(logger_name_str)
     def execute_queries_from_json(
         self, 
         json_array,
         query_vs_create='query'
-        ):
+        ):        
         required_keys = {'execution_order_id', 'dataset_id', 'query_path', 'schema'}
-        
-        self.logger.debug(f"json_array: {json_array}")
-
         for key, item in json_array.items():
             self.logger.debug(f"item: {item}")
             if not required_keys.issubset(item):
@@ -173,8 +191,9 @@ def main():
     with open(r'C:\_repos\google-analytics-insight-generation\config\bq_table_config.json', 'r') as file:
         json_array = json.load(file)
     
+    json_array_updated = {'_transaction_items': json_array['_transaction_items']}
     bq.execute_queries_from_json(
-        json_array,
+        json_array=json_array_updated,
         query_vs_create='query'
         )
 
