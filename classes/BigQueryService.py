@@ -6,17 +6,26 @@ from google.cloud import bigquery
 from google.cloud.exceptions import NotFound, GoogleCloudError
 from google.api_core.exceptions import GoogleAPIError
 
-from classes.LoggingManager import create_logger
+from classes.LoggingManager import LoggerClass
+from classes.ConfigManager import ConfigManager
+
+logger_name_str = 'log_bigquery_io'
 
 class BigQueryService:
     def __init__(self, bq_client) -> None:
-        self.logger = create_logger(
+        # Loading configuration from a YAML file
+        ConfigManager(
+            yaml_filepath='C:/Users/Admin/OneDrive/Desktop/_work/__repos (unpublished)/_____CONFIG/google-analytics-insight-generation/config',
+            yaml_filename='config.yaml'
+        )
+        logger_service = LoggerClass(
             dirname='log', 
-            logger_name='log_bigquery_io',
+            logger_name=logger_name_str,
             debug_level='INFO',
             mode='w',
             stream_logs=True
             )
+        self.logger = logger_service.create_logger()
 
         self.bq_client = bq_client
 
@@ -113,6 +122,7 @@ class BigQueryService:
         self.logger.debug(f"results: {results}")
         return results
 
+    @LoggerClass.log_class_args(logger_name_str)
     def execute_queries_from_json(
         self, 
         json_array,
@@ -120,10 +130,10 @@ class BigQueryService:
         ):
         required_keys = {'execution_order_id', 'dataset_id', 'query_path', 'schema'}
         
-        print(f"json_array: {json_array}")
+        self.logger.debug(f"json_array: {json_array}")
 
         for key, item in json_array.items():
-            print(f"item: {item}")
+            self.logger.debug(f"item: {item}")
             if not required_keys.issubset(item):
                 missing_keys = required_keys - item.keys()
                 raise ValueError(f"Missing required keys: {missing_keys}")
@@ -135,11 +145,10 @@ class BigQueryService:
             dataset_id = query_info['dataset_id']
             table_id = query_name      
 
-            print(f"query_name: {query_name}")
-            print(f"query_info: {query_info}")
-            print(f"sql_file_path: {sql_file_path}")
-            print(f"dataset_id: {dataset_id}")
-            print(f"table_id: {table_id}")
+            self.logger.info(f"query_name: {query_name}")
+            self.logger.info(f"sql_file_path: {sql_file_path}")
+            self.logger.info(f"dataset_id: {dataset_id}")
+            self.logger.info(f"table_id: {table_id}")
 
             # Execute the query
             self.execute_query_from_filepath(
@@ -150,7 +159,7 @@ class BigQueryService:
             )
   
 def main():
-    bq_client = bigquery.Client(project='key-utility-407314')
+    bq_client = bigquery.Client()
     bq = BigQueryService(bq_client)
 
     # # 2. Generate a query from a filepath

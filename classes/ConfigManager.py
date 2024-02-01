@@ -3,9 +3,10 @@ import yaml
 import dotenv
 import json
 
-from classes.LoggingManager import create_logger
+from classes.LoggingManager import LoggerClass
 
 runtime_logger_level = 'DEBUG'
+logger_name_str='logger_ConfigManagerClass'
 
 class ConfigManager:
     _instance = None
@@ -18,17 +19,15 @@ class ConfigManager:
         return cls._instance
 
     def init_attributes(self):
-        # Create logger
-        self.logger = create_logger(
+        logger_service = LoggerClass(
             dirname='log', 
-            logger_name='logger_ConfigManagerClass', 
+            logger_name=logger_name_str,
             debug_level=runtime_logger_level,
             mode='w',
-            stream_logs=True,
-            encoding='UTF-8'
-            )
-        
-        # Initialize all instance attributes
+            stream_logs=True
+            )        
+        self.logger = logger_service.create_logger()
+
         self.env_dir_path = None
 
     def initialize_config(self, yaml_filepath, yaml_filename):
