@@ -1,53 +1,52 @@
 import logging
-import inspect
-import json
 import functools
 
-def create_logger(
-        dirname='log', 
-        logger_name=None, 
-        debug_level='DEBUG', 
-        mode='w',
-        stream_logs = True,
-        encoding='UTF-8'
-        ):
-    
-    level_mapping = {
-        'DEBUG': logging.DEBUG,
-        'INFO': logging.INFO,
-        'WARNING': logging.WARNING,
-        'ERROR': logging.ERROR,
-        'EXCEPTION': logging.ERROR,
-    }
-    debug_level = debug_level.upper()
+class LoggerClass:
+    def __init__(self, dirname='log', logger_name=None, debug_level='DEBUG', mode='w', stream_logs=True, encoding='UTF-8'):
+        self.dirname = dirname
+        self.logger_name = logger_name
+        self.debug_level = debug_level.upper()
+        self.mode = mode
+        self.stream_logs = stream_logs
+        self.encoding = encoding
+        #self.logger = logging.getLogger(__name__)
 
-    if debug_level not in level_mapping:
-        raise ValueError(f"Invalid debug_level: {debug_level}. Must be one of: {', '.join(level_mapping.keys())}")
+    def create_logger(self):
+        level_mapping = {
+            'DEBUG': logging.DEBUG,
+            'INFO': logging.INFO,
+            'WARNING': logging.WARNING,
+            'ERROR': logging.ERROR,
+            'CRITICAL': logging.CRITICAL,
+        }
 
-    logger = logging.getLogger(logger_name if logger_name else __name__)
-    
-    # Clear existing handlers
-    for handler in logger.handlers[:]:
-        handler.close()
-        logger.removeHandler(handler)
+        if self.debug_level not in level_mapping:
+            raise ValueError(f"Invalid debug_level: {self.debug_level}. Must be one of: {', '.join(level_mapping.keys())}")
 
-    logger.setLevel(level_mapping[debug_level])
+        logger = logging.getLogger(self.logger_name if self.logger_name else __name__)
+        
+        # Clear existing handlers
+        for handler in logger.handlers[:]:
+            handler.close()
+            logger.removeHandler(handler)
 
-    # Create the formatter/
-    formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - Name: %(funcName)s - Line: %(lineno)d - %(message)s')
+        logger.setLevel(level_mapping[self.debug_level])
 
-    file_handler = logging.FileHandler(f'{dirname}/{logger_name}.log', mode=mode, encoding=encoding)
-    file_handler.setLevel(level_mapping[debug_level])
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+        # Create the formatter
+        formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - Name: %(funcName)s - Line: %(lineno)d - %(message)s')
 
-    if stream_logs == True:
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(level_mapping[debug_level])
-        stream_handler.setFormatter(formatter)
-        logger.addHandler(stream_handler)
-    
-    return logger
+        file_handler = logging.FileHandler(f'{self.dirname}/{self.logger_name}.log', mode=self.mode, encoding=self.encoding)
+        file_handler.setLevel(level_mapping[self.debug_level])
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+        if self.stream_logs:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setLevel(level_mapping[self.debug_level])
+            stream_handler.setFormatter(formatter)
+            logger.addHandler(stream_handler)
+        
+        return logger
 
 def log_class_args(func):
     @functools.wraps(func)
