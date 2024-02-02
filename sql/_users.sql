@@ -12,26 +12,25 @@ WITH
     GROUP BY 1,2,3,4,5,6,7
   ),
 
-  pageviews AS (
-    SELECT
-      pv.user_pseudo_id,
-      COUNT(*) as pageviews
-    FROM (
-      SELECT 
-        user_pseudo_id,
-        event_name
-      FROM t1
-      WHERE event_name = 'page_view'   
-    ) as pv
-    GROUP BY pv.user_pseudo_id
-  ),
+  -- pageviews AS (
+  --   SELECT
+  --     pv.user_pseudo_id,
+  --     COUNT(*) as pageviews
+  --   FROM (
+  --     SELECT 
+  --       user_pseudo_id,
+  --       event_name
+  --     FROM t1
+  --     WHERE event_name = 'page_view'   
+  --   ) as pv
+  --   GROUP BY pv.user_pseudo_id
+  -- ),
 
   user_details AS (
     SELECT
       user_pseudo_id,
       MIN(event_timestamp) as min_user_event_timestamp,
       MIN(event_timestamp) as max_user_event_timestamp,
-      COUNT(DISTINCT ga_session_id) as count_of_sessions, 
     FROM t1
     GROUP BY 
       1
@@ -65,19 +64,18 @@ WITH
         PARTITION BY t1.user_pseudo_id
         ORDER BY event_timestamp ASC
         RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-      ) as user_traffic_name,
-
-      -- Measures
-      ssd.count_of_sessions,
-      pv.pageviews
+      ) as user_traffic_name
 
     FROM t1 as t1
       LEFT JOIN user_details as ssd
         ON t1.user_pseudo_id = ssd.user_pseudo_id
-      LEFT JOIN pageviews as pv
-        ON t1.user_pseudo_id = pv.user_pseudo_id
   )
 
 SELECT DISTINCT 
-  *
-FROM user_traffic_sources
+  uts.user_pseudo_id,
+  min_user_event_timestamp,
+  max_user_event_timestamp,
+  user_traffic_source,
+  user_traffic_medium,
+  user_traffic_name
+FROM user_traffic_sources as uts
