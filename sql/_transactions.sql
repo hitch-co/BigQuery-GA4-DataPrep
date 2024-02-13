@@ -33,7 +33,7 @@ SELECT
   user_pseudo_id,
   ga_session_id,
   transaction_id,
-  TIMESTAMP_MICROS(event_timestamp) as event_timestamp_timestamp,
+  TIMESTAMP_MICROS(event_timestamp) as event_timestamp,
   SUM(total_item_quantity) as total_item_quantity,
   SUM(purchase_revenue) as revenue
 FROM users_purchases
@@ -46,4 +46,4 @@ ORDER BY
   user_pseudo_id, 
   transaction_id, 
   ga_session_id,
-  event_timestamp_timestamp
+  event_timestamp
