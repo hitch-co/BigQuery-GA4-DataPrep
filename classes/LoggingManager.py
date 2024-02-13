@@ -65,3 +65,17 @@ class LoggerClass:
                 return func(self, *args, **kwargs)
             return wrapper
         return decorator
+    
+def main():
+    logger = LoggerClass(
+        dirname='log', 
+        logger_name='example', 
+        debug_level='DEBUG', 
+        mode='w', 
+        stream_logs=True, 
+        encoding='UTF-8'
+        ).create_logger()
+    logger.info('This is a test message')
+    logger.debug('This is a debug message')
+    logger.error('This is an error message')
+    logger.warning('This is a warning message')

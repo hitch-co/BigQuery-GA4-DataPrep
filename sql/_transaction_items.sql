@@ -2,6 +2,7 @@ WITH results as  (
   SELECT
     event_timestamp,
     user_pseudo_id,
+    ga_session_id,
     ecommerce.transaction_id as transaction_id,
     item.item_id,
     item.price,
@@ -19,6 +20,7 @@ WITH results as  (
 
 SELECT 
   transaction_id,
+  ga_session_id
   item_id,
   event_timestamp,
   AVG(price) as price,
@@ -27,6 +29,7 @@ SELECT
 FROM results
 GROUP BY
   transaction_id,
+  ga_session_id,
   item_id,
   event_timestamp
 ORDER BY transaction_id, item_id

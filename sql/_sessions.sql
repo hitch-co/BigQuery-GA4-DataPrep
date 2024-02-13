@@ -1,6 +1,6 @@
 WITH 
 
-hit_traffic_sources AS (
+_hit_traffic_sources AS (
   SELECT 
     event_timestamp,
     user_pseudo_id,
@@ -15,37 +15,19 @@ hit_traffic_sources AS (
     (SELECT value.string_value FROM UNNEST(event_params) as ep WHERE key = 'campaign') IS NOT NULL
 ),
 
-session_start_dates AS (
+_session_start_dates AS (
   SELECT
     user_pseudo_id,
     ga_session_id,
     MIN(event_timestamp) as min_session_event_timestamp,
     MAX(event_timestamp) as max_session_event_timestamp
-  FROM hit_traffic_sources
+  FROM _hit_traffic_sources
   GROUP BY
     1,2
 ),
 
-pageviews AS (
-  SELECT
-    user_pseudo_id,
-    ga_session_id,
-    COUNT(*) as pageviews
-  FROM (
-    SELECT 
-      user_pseudo_id,
-      (SELECT value.int_value FROM UNNEST(event_params) as ep WHERE key = 'ga_session_id') as ga_session_id,
-      event_name
-    FROM `key-utility-407314.eh_ga4_obfuscated_sample_ecommerce.eh_ga4_obfuscated_filtered`
-    WHERE event_name = 'page_view'   
-  ) as pv
-  GROUP BY 
-    pv.user_pseudo_id,
-    pv.ga_session_id
-),
-
 session_traffic_sources AS (
-  SELECT
+  SELECT DISTINCT
     hts.user_pseudo_id,
     hts.ga_session_id,
     ssd.max_session_event_timestamp,
@@ -87,36 +69,49 @@ session_traffic_sources AS (
       RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
     ) as session_traffic_campaign,
 
-    -- measures
-    pv.pageviews
-    
-  FROM hit_traffic_sources as hts
-    LEFT JOIN session_start_dates as ssd
+  FROM _hit_traffic_sources as hts
+    LEFT JOIN _session_start_dates as ssd
       ON hts.user_pseudo_id = ssd.user_pseudo_id
       AND hts.ga_session_id = ssd.ga_session_id
-    LEFT JOIN pageviews as pv
-      ON hts.user_pseudo_id = pv.user_pseudo_id
-      AND pv.user_pseudo_id = pv.user_pseudo_id
-  ORDER BY hts.user_pseudo_id, hts.event_timestamp
+  ORDER BY hts.user_pseudo_id, ssd.min_session_event_timestamp
+),
+
+pageviews AS (
+  SELECT
+    user_pseudo_id,
+    ga_session_id,
+    COUNT(*) as pageviews
+  FROM (
+    SELECT 
+      user_pseudo_id,
+      (SELECT value.int_value FROM UNNEST(event_params) as ep WHERE key = 'ga_session_id') as ga_session_id,
+      event_name
+    FROM `key-utility-407314.eh_ga4_obfuscated_sample_ecommerce.eh_ga4_obfuscated_filtered`
+    WHERE event_name = 'page_view'   
+  ) as pv
+  GROUP BY 
+    pv.user_pseudo_id,
+    pv.ga_session_id
 )
+
 
 -- FINAL QUERY
 SELECT DISTINCT
-  user_pseudo_id,
-  ga_session_id,
-  TIMESTAMP_MICROS(min_session_event_timestamp) as min_session_event_timestamp,
-  TIMESTAMP_MICROS(max_session_event_timestamp) as max_session_event_timestamp,
-  TIMESTAMP_DIFF(TIMESTAMP_MICROS(max_session_event_timestamp), TIMESTAMP_MICROS(min_session_event_timestamp), SECOND) AS session_duration_seconds,
-  ga_session_number,
-  session_traffic_source,
-  session_traffic_medium,
-  session_traffic_campaign,
-  SUM(pageviews) as pageviews, 
-FROM session_traffic_sources
-
+  sts.user_pseudo_id,
+  sts.ga_session_id,
+  TIMESTAMP_MICROS(sts.min_session_event_timestamp) as min_session_event_timestamp,
+  TIMESTAMP_MICROS(sts.max_session_event_timestamp) as max_session_event_timestamp,
+  TIMESTAMP_DIFF(TIMESTAMP_MICROS(sts.max_session_event_timestamp), TIMESTAMP_MICROS(sts.min_session_event_timestamp), SECOND) AS session_duration_seconds,
+  sts.ga_session_number,
+  sts.session_traffic_source,
+  sts.session_traffic_medium,
+  sts.session_traffic_campaign,
+  SUM(pv.pageviews) as pageviews, 
+FROM session_traffic_sources as sts
+LEFT JOIN pageviews as pv
+  ON sts.user_pseudo_id = pv.user_pseudo_id
+  AND sts.ga_session_id = pv.ga_session_id
 --WHERE user_pseudo_id = '2221352.0772999791'
-
 GROUP BY
   1,2,3,4,5,6,7,8,9
-
 ORDER BY user_pseudo_id, min_session_event_timestamp
