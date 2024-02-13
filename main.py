@@ -5,6 +5,14 @@ from classes.BigQueryService import BigQueryService
 from classes.ConfigManager import ConfigManager
 from classes.LoggingManager import LoggerClass
 
+##################################################
+# Query data or create/replace a table in BigQuery. 
+query_vs_create = 'create'  # Options: 'create' or 'query'
+
+# Define the table_id to work with in BQ (specific ID, '', 'all', or None)
+runtime_table_id = 'all'  # '_transaction_items'
+
+##################################################
 # Setup logger
 logger_name_str = 'main'
 runtime_logger_level = 'DEBUG'
@@ -26,13 +34,6 @@ config = ConfigManager(
 # Initializing BigQuery client and create an instance of BigQueryService for interacting with BigQuery
 bq_client = bigquery.Client(project=config.bq_project_id)
 bq_io = BigQueryService(bq_client)
-
-##################################################
-# Query data or create/replace a table in BigQuery. 
-query_vs_create = 'create'  # Options: 'create' or 'query'
-
-# Define the table_id to work with in BQ (specific ID, '', 'all', or None)
-runtime_table_id = 'all'  # '_transaction_items'
 
 #################################################
 # Processing custom runtime_table_id if provided
