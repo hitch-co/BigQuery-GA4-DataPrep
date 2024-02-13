@@ -49,10 +49,29 @@
         ]
     },    
 
+    "__prod_transaction_details": {
+        "execution_order_id": 2,
+        "dataset_id": "key-utility-407314.eh_ga4_prod",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/__prod_transaction_details.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },
+
     "__prod_users_details": {
         "execution_order_id": 2,
         "dataset_id": "key-utility-407314.eh_ga4_prod",
         "query_path": "C:/_repos/google-analytics-insight-generation/sql/__prod_users_details.sql",
+        "schema": [
+            {"name": "name", "type": "STRING", "mode": "REQUIRED"},
+            {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}
+        ]
+    },
+    "__prod_users_session_details": {
+        "execution_order_id": 2,
+        "dataset_id": "key-utility-407314.eh_ga4_prod",
+        "query_path": "C:/_repos/google-analytics-insight-generation/sql/__prod_users_session_details.sql",
         "schema": [
             {"name": "name", "type": "STRING", "mode": "REQUIRED"},
             {"name": "age", "type": "INTEGER", "mode": "REQUIRED"}

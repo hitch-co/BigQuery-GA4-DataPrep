@@ -8,7 +8,7 @@ WITH users_purchases as (
     CAST(user_pseudo_id AS STRING) as user_pseudo_id,
     ga_session_id,
     CAST(ga_session_id AS STRING) as ga_session_id_string,
-    TIMESTAMP_MICROS(event_timestamp) as event_timestamp_timestamp,
+    TIMESTAMP_MICROS(event_timestamp) as event_timestamp,
     transaction_id,
     items_json
   FROM (
@@ -87,19 +87,19 @@ SELECT
   -- Keys/identifiers
   up.user_pseudo_id,
   up.ga_session_id,
-  up.event_timestamp_timestamp,
+  up.event_timestamp,
 
   -- Session/Transaction Order
   DENSE_RANK()
   OVER (
     PARTITION BY up.user_pseudo_id
-    ORDER BY up.event_timestamp_timestamp ASC
+    ORDER BY up.event_timestamp ASC
   ) as user_transaction_number,
   
   DENSE_RANK()
   OVER (
     PARTITION BY up.user_pseudo_id, up.ga_session_id
-    ORDER BY up.event_timestamp_timestamp ASC
+    ORDER BY up.event_timestamp ASC
   ) as session_transaction_number,
 
   sld.ga_session_number,
