@@ -1,14 +1,11 @@
 env_dir_path: 'path/to/env'
 env_file_name: 'config.env'
 
+bq_table_config_dirpath: 'path\to\config\directory'
+bq_table_config_filename: 'bq_table_config.json'
+
+runtime_table_ids_filepath: 'path\to\runtime_queries.json'
+
 bq_details:
-  bq_project_id: 'key-utility-407314'
-  bq_dataset_id: 'eh_ga4_stg'
-
-primary_bq_query:
-  query_path: 'path/to/your/sql/file.sql'
-  bq_table_id: 'my_test_table1'
-
-other_bq_query:
-  query_path: 'path/to/your/sql/file.sql'
-  bq_table_id: 'my_test_table2'
+  bq_project_id: 'your-project-id-123'
+  #bq_dataset_id: 'yourdatasetid'

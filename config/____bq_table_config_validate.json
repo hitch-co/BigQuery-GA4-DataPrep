@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "patternProperties": {
+      "^_": {
+        "type": "object",
+        "properties": {
+          "execution_order_id": { "type": "integer" },
+          "dataset_id": { "type": "string" },
+          "query_path": { "type": "string", "format": "uri" },
+          "schema": {
+            "type": "array"
+          }
+        },
+        "required": ["execution_order_id", "dataset_id", "query_path"],
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  }
